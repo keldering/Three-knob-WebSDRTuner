@@ -1,6 +1,23 @@
+////////////////////////////This software was at first initiated by PA1KE 7 may 2021
+////////////////////////////badsed on an article in the Dutch Ham magazine "Electron"
+////////////////////////////April 2021 where an indication of use of one (optical) Rotary encoder 
+////////////////////////////for Web SDR control was suggested for a limited set of functions for 
+////////////////////////////several WebSDR's.
+////////////////////////////
+////////////////////////////The first ALFA releaseof this softwaer was done on Github at 26 mai2021 
+////////////////////////////The idea of the Three Knob (Kiwi)SDRTuner is to access  
+////////////////////////////all the function that are made accessible in the original
+////////////////////////////KiwiSDR software. This is done by means of an XIAO (SAMND21), Arduino like)
+////////////////////////////processor board. Three ordinary cheap rotary encoders with a OLED dsplay 128x64 
+////////////////////////////are the only used components used.
+
+                            
 
 #include <Wire.h>
+//#include <Adafruit_SPIDevice.h>
+//#include <Adafruit_I2CDevice.h>
 #include <TinyUSB_Mouse_and_Keyboard.h>
+//#include <ssd1306xled.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 
@@ -38,7 +55,7 @@ static int initial_band=0; //future use reminder
 
 static int modulation_codes[] = {97,97,65,65,65,65,65,100,108,108,117,117,99,99,102,113};
 
-//  For RaspSDR 6m and IPB25               0       1         2       3        4        5        6       7     8       9
+//  For RaspSDR with 6m and IPB25          0       1         2       3        4        5        6       7     8       9
 //static char *band_display_codes[] =   {"LW"  ,"MW"    ,"120m" ,"90m"   ,"75m"   ,"60m"    ,"49m"  ,"41m"  ,"31m"  ,"25m"  ,
 //                                      "22m"  ,"19m"   ,"16m"  ,"15m"   ,"13m"   ,"11m"    ,"VLF"  ,"LF"   ,"NDB"  ,"DGPS" ,
 //                                      "TM2.5","TM3.33","TM5"  ,"TM7.85","TM 10" ,"TM14.67","TM15" ,"TM20" ,"TM25" ,"LF"   ,
@@ -46,7 +63,7 @@ static int modulation_codes[] = {97,97,65,65,65,65,65,100,108,108,117,117,99,99,
 //                                      "10m"  , "6m"  ,"IPB20" ,"IPB17","IPB15" ,"IPB12" ,"IPB10"  ,"3594" ,"4558" ,"5154" ,
 //                                      "5156L","5292B","6928V" ,"7039" ,"7509 " ,"8000C" ,"8495"   ,"10872","13528","16332","20048"};
        
-       //  For KiwiSDR no 6m and no IPB25   0       1         2       3        4        5        6       7     8       9
+//  For KiwiSDR no 6m and no IPB25        0       1         2       3        4        5        6       7     8       9
 static char *band_display_codes[] =   {"LW"  ,"MW"    ,"120m" ,"90m"   ,"75m"   ,"60m"    ,"49m"  ,"41m"  ,"31m"  ,"25m"  ,
                                       "22m"  ,"19m"   ,"16m"  ,"15m"   ,"13m"   ,"11m"    ,"VLF"  ,"LF"   ,"NDB"  ,"DGPS" ,
                                       "TM2.5","TM3.33","TM5"  ,"TM7.85","TM 10" ,"TM14.67","TM15" ,"TM20" ,"LF"   ,
@@ -64,7 +81,7 @@ static char *band_display_codes[] =   {"LW"  ,"MW"    ,"120m" ,"90m"   ,"75m"   
             
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-//----------------------------------------------------------------------------------Rotary functions 
+//----------------------------------------------------------------------------------Code for Rotary functions 
 int8_t read_rotary_1() {
   PrNxt1 <<= 2;
   if (digitalRead(DATA1)) PrNxt1 |= 0x02;
@@ -136,11 +153,11 @@ int8_t read_rsw3() {
   if (!digitalRead(MSC)){
     delay(300);    
     misc += 1;
-    if(misc>=5)misc=0;
+    if(misc>=3)misc=0;
   }
   return misc;
 }
-//----------------------------------------------------------------------------------Display routines
+//----------------------------------------------------------------------------------Code for Display routines
 void disp_init(){
     display.clearDisplay();display.display();
     display.setCursor(0,0); display.print ("Left-|--Mid--|-Right");
@@ -167,24 +184,31 @@ void disp_all(){
         if (c1==7)  {display.setCursor(0,18); display.print("DRM");}             
         if (c1==8)  {display.setCursor(0,18); display.print("LSB");}
         if (c1==9)  {display.setCursor(0,18); display.print("LSN");}             
-        if (c1==10)  {display.setCursor(0,18); display.print("USB");}
-        if (c1==11)  {display.setCursor(0,18); display.print("USN");}             
-        if (c1==12)  {display.setCursor(0,18); display.print("CW");}
-        if (c1==13)  {display.setCursor(0,18); display.print("CWN");}    
-        if (c1==14){display.setCursor(0,18); display.print("NBFM");}        
-        if (c1==15){display.setCursor(0,18); display.print("IQ");}    
+        if (c1==10) {display.setCursor(0,18); display.print("USB");}
+        if (c1==11) {display.setCursor(0,18); display.print("USN");}             
+        if (c1==12) {display.setCursor(0,18); display.print("CW");}
+        if (c1==13) {display.setCursor(0,18); display.print("CWN");}    
+        if (c1==14) {display.setCursor(0,18); display.print("NBFM");}        
+        if (c1==15) {display.setCursor(0,18); display.print("IQ");}    
     }
     if (modu==2){
      display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-");  
-     display.setCursor(0,18); display.print("VOL");  display.setCursor(20,18); display.print(c1);     
+     display.setCursor(1,18); display.print("VOL");  
+     display.setCursor(8,27); display.print(c1);     
     }
      if (freq==0) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
       display.setCursor(30,18); display.print   ("|FAST   | ");
+      if ((c1==12)| (c1==13)){
+         display.setCursor(40,27); display.print("100Hz");} else { 
+         display.setCursor(40,27); display.print("1kHz");} 
      }
      if (freq==1) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(30,18);    display.print("|SLOW   |");  
+      display.setCursor(30,18);display.print("|SLOW   |");
+     if ((c1==12)| (c1==13)){
+         display.setCursor(40,27); display.print(" 10Hz");} else { 
+         display.setCursor(40,27); display.print("100Hz");}  
      }
      if (freq==2) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
@@ -194,24 +218,17 @@ void disp_all(){
      if (freq==3) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
       display.setCursor(30,18);    display.print("|BAND   |");
-      display.setCursor(30,28); display.print(band_display_codes[c2]);
+      display.setCursor(40,27); display.print(band_display_codes[c2]);
      }
      if (misc==1){
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(77,18); display.print("|ZOOM");  
+      display.setCursor(77,18); display.print(" ZOOM");  
      }
      if (misc==2){
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(77,18); display.print("WF Min");  
+      display.setCursor(77,18); display.print(" WF Min");  
      }
-     if (misc==3){
-      display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(77,18); display.print("WF floor");  
-     }
-     if (misc==4){
-      display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(77,18); display.print("WF rate");  
-     }
+     
      if (misc==0){
       disp_init();
      }
@@ -219,7 +236,7 @@ void disp_all(){
      
 }
 
-//----------------------------------------------------------------------------------Initial Setup routines
+//----------------------------------------------------------------------------------Code for Initial Setup routines
 void setup() {
   pinMode(CLK1, INPUT);
   pinMode(CLK1, INPUT_PULLUP);
