@@ -6,9 +6,26 @@ April 2021 where an indication of use of one (optical) Rotary encoder
 for Web SDR control was suggested for a limited set of functions for 
 several WebSDR's.
 
-The first ALFA releaseof this softwaer was done on Github at 26 mai2021 
+The first ALFA release of this softwaer was done on Github at 26 mai2021 
 The idea of the Three Knob (Kiwi)SDRTuner is to access  
 all the function that are made accessible in the original
-KiwiSDR software. This is done by means of an XIAO (SAMND21), Arduino like)
-processor board. Three ordinary cheap rotary encoders with a OLED dsplay 128x64 
-are the only components used.
+KiwiSDR software. This is done by means of a small XIAO (SAMND21), Arduino like)
+processor board. Besides the XIAO only three ordinary (cheap) rotary encoders with an OLED dsplay 128x64 
+are the only components used. The software generates keyboard codes and sends them via the USB (C) port
+of the XIAO to the device that runs the websdr software in a browser thus emulating a real keyboard connection.
+The keys are sent to the device regardless the software it runs, so the TKKT (Three Knob KIWI Tuner) starts
+in a locked mode where actually nothing is sent to the device running the browser with the SDR running in it.
+(This to prevent unwanted keystrokes into to whatever software runs at the moment the TKKT is connected to the USB port).
+
+
+User interface states:
+1. At startup:
+Left-|--Mid--|-Right
+-------Locked-------
+In this state the 
+
+2.One press on the right button unlocks the the system and it displays it main screen default screen:
+Left-|--Mid--|-Right
+-MOD-|--FRQ--|-DISP-
+AM   |FAST   |ZOOM
+       1kHz 
