@@ -18,14 +18,3 @@ in a locked mode where actually nothing is sent to the device running the browse
 (This to prevent unwanted keystrokes into to whatever software runs at the moment the TKKT is connected to the USB port).
 
 
-User interface states:
-1. At startup:
-Left-|--Mid--|-Right
--------Locked-------
-In this state the 
-
-2.One press on the right button unlocks the the system and it displays it main screen default screen:
-Left-|--Mid--|-Right
--MOD-|--FRQ--|-DISP-
-AM   |FAST   |ZOOM
-       1kHz 
