@@ -8,7 +8,7 @@ several WebSDR's.
 
 The first ALFA release of this software was done on Github at 26 mai2021 
 The idea of the Three Knob (Kiwi)SDRTuner is to access  
-all the function that are made accessible in the original
+all the functions that are made accessible by keystrokes in the original
 KiwiSDR software. This is done by means of a small XIAO (SAMD21), Arduino like)
 processor board. Besides the XIAO only three ordinary (cheap) rotary encoders with an OLED dsplay 128x64 
 are the only components used. The software generates keyboard codes and sends them via the USB (C) port
