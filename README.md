@@ -19,7 +19,7 @@ The keys are sent to the device regardless the software it runs, so the TKKT (Th
 in a locked mode where actually nothing is sent to the device running the browser with the SDR running in it.
 (This to prevent unwanted keystrokes into to whatever software runs at the moment the TKKT is connected to the USB port).
 
-Opposite to optical encoders these ordinary raotary encoders need to be debounced.
+Opposite to optical encoders these ordinary rotary encoders need to be debounced.
 There is a very elegant solution to do this in software at:
 https://www.best-microcontroller-projects.com/rotary-encoder.html
 I used this software and it works very well so no need for the rather encombrent
