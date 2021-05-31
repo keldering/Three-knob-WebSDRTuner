@@ -4,10 +4,10 @@
 ////////////////////////////for Web SDR control was suggested for a limited set of functions for 
 ////////////////////////////several WebSDR's.
 ////////////////////////////
-////////////////////////////The first ALFA releaseof this softwaer was done on Github at 26 mai2021 
+////////////////////////////The first ALFA releaseof this software was done on Github at 26 mai2021 
 ////////////////////////////The idea of the Three Knob (Kiwi)SDRTuner is to access  
-////////////////////////////all the function that are made accessible in the original
-////////////////////////////KiwiSDR software. This is done by means of an XIAO (SAMND21), Arduino like)
+////////////////////////////all the functions that are made accessible by keystokes in the original
+////////////////////////////KiwiSDR software. This is done by means of an XIAO (SAMD21), Arduino like)
 ////////////////////////////processor board. Three ordinary cheap rotary encoders with a OLED dsplay 128x64 
 ////////////////////////////are the only components used.
 
@@ -49,9 +49,15 @@ static int8_t freq=0;
 static int8_t prvfreq=0;
 static int8_t misc=0;
 static int8_t prvmisc=0;
+
 static int8_t c1,val1;
 static int8_t c2,val2;
 static int8_t c3,val3;
+
+
+static int8_t c1m,val1m,c1f,val1f,c1d,val1d;
+static int8_t c2m,val2m,c2f,val2f,c2d,val2d;
+static int8_t c3m,val3m,c3f,val3f,c3d,val3d;
 static int initial_mod_sub=0; 
 static int initial_mod_vol=3;
 static int initial_mod_mod=3;  //LSB
@@ -217,7 +223,6 @@ void disp_all(){
     display.setCursor(0,0); display.println ("Left-|--Mid--|-Right");
     if (misc==0) {display.setCursor(0,9);  display.print("-------LOCKED-------");} else
                  {display.setCursor(0,9);  display.print("-MOD-|--FRQ--|-DISP-");}
-    aa
     if (modu==0){                                                                             
         //static int keyb_codes[] = {97,97,65,65,65,65,65,100,108,108,117,117,99,99,102,113};
         //static char *mod_display_codes[] = { "AM","SAM","DRM","LSB","USB","CW","NBFM","IQ"};
@@ -345,11 +350,8 @@ void setup() {
 //----------------------------------------------------------------------------------Main Loop
 
 void loop() {
-if (misc!=0){ 
- 
-
+if (misc!=0){  
 //----------------------------------------------------------------------------------Switch Handling MOD Rotary 1 SW
-
 prvmodu=modu; 
 modu=read_rsw1();           
 if (prvmodu != modu) {
@@ -362,8 +364,7 @@ if (prvmodu != modu) {
   disp_all();
 } 
 
-  //Switch Handling MOD Rotary Button SW1 in sub modus
- 
+  
                
              
 
@@ -388,54 +389,47 @@ if (prvmodu != modu) {
  
  if((val1=read_rotary_1())) 
  {  
-//  Handling MOD Rot 1 
+    //  Handling MOD Rot 1 
     if (modu==0){                 
-
           prv_c1=c1; 
-          if ( PrNxt1==0x0b) {//CW  +
-              
+          if ( PrNxt1==0x0b) {//CCW  -              
               c1 +=val1;   
-              if (c1==5)  Keyboard.write(modulation_codes[c1]); //KIWI Quirk modulation type key sequence         
+              if (c1==5)  Keyboard.write(modulation_codes[c1]); //KIWI Quirk modulation type key sequence CW
+              //if (c1==0)  Keyboard.write(modulation_codes[c1]); //KIWI Quirk modulation type key sequence AM         
           } 
-          if ( PrNxt1==0x07) {//CCW -          
-               
-              c1 +=val1; 
-                                 
+          if ( PrNxt1==0x07) {//CW +                       
+               c1 +=val1;                                  
           }
-          if (c1>7) c1=7;
-          if (c1<0) c1=0;
-          nxt_c1=c1;
-          SerialUSB.print(" c1= ");
-          SerialUSB.print(c1,DEC);                  
-          SerialUSB.print(" mod= ");
-          SerialUSB.println(modulation_codes[c1]);
-            
-          if (prv_c1!=nxt_c1){       
-          if (c1==0){Keyboard.write(modulation_codes[c1]);sub_modu=0; }    //AM/AMN 
-          if (c1==1){Keyboard.write(modulation_codes[c1]);sub_modu=1; }    //SAM...QAM
-          if (c1==2){Keyboard.write(modulation_codes[c1]);sub_modu=2; }
-          delay(300);
-          if (c1==3){Keyboard.write(modulation_codes[c1]);sub_modu=3; }    //LSB/LSN
-          if (c1==4){Keyboard.write(modulation_codes[c1]);sub_modu=4; }    //USB/USN
-          if (c1==5){Keyboard.write(modulation_codes[c1]);sub_modu=5; }    //CW/CWN
-          if (c1==6){Keyboard.write(modulation_codes[c1]);sub_modu=6; }
-          if (c1==7){Keyboard.write(modulation_codes[c1]);sub_modu=7; }              
-          disp_all();
-          //}
-          //else {          
-          //SerialUSB.print("prv_c1= ");
-          //SerialUSB.print(prv_c1,DEC);
-          //SerialUSB.print("nxt_c1= ");
-          //SerialUSB.print(nxt_c1,DEC);  
-          SerialUSB.print("sub_modu= ");
-          SerialUSB.print(sub_modu,DEC); 
-          }
-
-    
+      if (c1>7) c1=7;
+      if (c1<0) c1=0;
+      nxt_c1=c1;
+      SerialUSB.print(" c1= ");
+      SerialUSB.print(c1,DEC);                  
+      SerialUSB.print(" mod= ");
+      SerialUSB.println(modulation_codes[c1]);
+        
+      if (prv_c1!=nxt_c1){       
+      if (c1==0){Keyboard.write(modulation_codes[c1]);sub_modu=0; }    //AM/AMN 
+      if (c1==1){Keyboard.write(modulation_codes[c1]);sub_modu=1; }    //SAM...QAM
+      if (c1==2){Keyboard.write(modulation_codes[c1]);sub_modu=2; }
+      delay(500);                                                      //No other turns before DRM is settled
+      if (c1==3){Keyboard.write(modulation_codes[c1]);sub_modu=3; }    //LSB/LSN
+      if (c1==4){Keyboard.write(modulation_codes[c1]);sub_modu=4; }    //USB/USN
+      if (c1==5){Keyboard.write(modulation_codes[c1]);sub_modu=5; }    //CW/CWN
+      if (c1==6){Keyboard.write(modulation_codes[c1]);sub_modu=6; }
+      if (c1==7){Keyboard.write(modulation_codes[c1]);sub_modu=7; }              
+      disp_all();
+      //}
+      //else {          
+      //SerialUSB.print("prv_c1= ");
+      //SerialUSB.print(prv_c1,DEC);
+      //SerialUSB.print("nxt_c1= ");
+      //SerialUSB.print(nxt_c1,DEC);  
+      SerialUSB.print("sub_modu= ");
+      SerialUSB.print(sub_modu,DEC); 
+      }  
   }
   
-
-
  //Switch Handling FRQ Rotary Button SW2
              prvfreq=freq; 
              freq=read_rsw2();
@@ -453,13 +447,11 @@ if (prvmodu != modu) {
    //Handling VOL Rot1
     if (modu==2){
                  
-          if ( PrNxt1==0x0b) {
-                  
+          if ( PrNxt1==0x0b) {                  
                   Keyboard.write(118);//V                                 
                   SerialUSB.println(c1,DEC);                 
                 }                            
-               
-          
+                       
           if ( PrNxt1==0x07) {
                   Keyboard.write(86);//v
                   SerialUSB.println(c1,DEC);
