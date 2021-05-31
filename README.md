@@ -22,7 +22,7 @@ in a locked mode where actually nothing is sent to the device running the browse
 Opposite to optical encoders these ordinary rotary encoders need to be debounced.
 There is a very elegant solution to do this in software at:
 https://www.best-microcontroller-projects.com/rotary-encoder.html
-I used this software and it works very well so no need for the rather encombrent
+I used this software and it works quite well so no need for the rather encombrent
 optical ones.
 
 
