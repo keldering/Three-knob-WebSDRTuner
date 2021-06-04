@@ -41,24 +41,46 @@ static uint16_t store2=0;
 static uint8_t PrNxt3= 0;
 static uint16_t store3=0;
 static int8_t rot_enc_table[] = {0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0};
-static int8_t modu=0; //if in menu MOD
+
 static int8_t sub_modu=0; // index modulation submenus 0 AM/AMN 1 SAM....QAM  2 LSB  3USB
-static int8_t prvsubmodu=0; 
-static int8_t prvmodu=0;
+//static int8_t prvsubmodu=0; 
+
+static int8_t val1,val2,val3;
+//static int8_t c2,val2;
+//static int8_t c3,val3;
+
+
+static int8_t modu=0; //if in menu MOD
 static int8_t freq=0;
-static int8_t prvfreq=0;
 static int8_t misc=0;
+
+static int8_t prvmodu=0;
+static int8_t prvfreq=0;
 static int8_t prvmisc=0;
-static int8_t c1,val1;
-static int8_t c2,val2;
-static int8_t c3,val3;
-static int initial_mod_sub=0; 
-static int initial_mod_vol=3;
-static int initial_mod_mod=3;  //LSB
-static int initial_freq=0;
-static int initial_disp=0;
-static int initial_freq_band=32; //80m
-static int initial_disp_zoom=7;
+
+static int8_t c1m0,val1m0; //modu =0 modulation types
+static int8_t c1m1,val1m1; //modu =1 sub-modulation types
+static int8_t c1m2,val1m2; //modu =2 Volume
+
+static int8_t c2f0,val2f0; //freq =0 FAST
+static int8_t c2f1,val2f1; //freq =1 SLOW
+static int8_t c2f2,val2f2; //freq =2 PASS
+static int8_t c2f3,val2f3; //freq =3 BAND
+//static int8_t c2f4,val2f42; //freq =4 Future menu entry
+
+
+static int8_t c3d0,val3d0; //misc =0 LOCKED
+static int8_t c3d1,val3d1; //misc =1 ZOOM
+static int8_t c3d2,val3d2; //misc =2 WF min
+static int8_t c3d3,val3d3; //misc =3 YYY
+
+//static int initial_mod_sub=0; 
+//static int initial_mod_vol=3;
+//static int initial_mod_mod=3;  //LSB
+//static int initial_freq=0;
+//static int initial_disp=0;
+//static int initial_freq_band=32; //80m
+//static int initial_disp_zoom=7;
 static bool via_boot=true;
 static int prv_c1;
 static int nxt_c1; 
@@ -217,7 +239,7 @@ void disp_all(){
     display.setCursor(0,0); display.println ("Left-|--Mid--|-Right");
     if (misc==0) {display.setCursor(0,9);  display.print("-------LOCKED-------");} else
                  {display.setCursor(0,9);  display.print("-MOD-|--FRQ--|-DISP-");}
-    aa
+    
     if (modu==0){                                                                             
         //static int keyb_codes[] = {97,97,65,65,65,65,65,100,108,108,117,117,99,99,102,113};
         //static char *mod_display_codes[] = { "AM","SAM","DRM","LSB","USB","CW","NBFM","IQ"};
@@ -243,39 +265,46 @@ void disp_all(){
     if (modu==2){
      display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-");  
      display.setCursor(1,18); display.print("VOL");  
-     display.setCursor(8,27); display.print(c1);     
+     display.setCursor(8,27); display.print(c1m2);     
     }
      if (freq==0) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
       display.setCursor(30,18); display.print   ("|FAST   | ");
-      if ((c1==12)| (c1==13)){
-         display.setCursor(40,27); display.print("100Hz");} else { 
-         display.setCursor(40,27); display.print("1kHz");} 
+      if ((c2f0==12)| (c2f0==13)){
+         display.setCursor(40,27); display.print("100Hz");} else { display.setCursor(40,27); display.print("1kHz");}
+         display.setCursor(50,36); display.print(c2f0);
      }
      if (freq==1) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
       display.setCursor(30,18);display.print("|SLOW   |");
-     if ((c1==12)| (c1==13)){
-         display.setCursor(40,27); display.print(" 10Hz");} else { 
-         display.setCursor(40,27); display.print("100Hz");}  
+         if ((c1m0==12) | (c1m0==13)){
+             display.setCursor(40,27); display.print(" 10Hz");
+             display.setCursor(40,36); display.print(c2f1*10,DEC);} 
+             else { 
+             display.setCursor(40,27); display.print("100Hz");
+             display.setCursor(40,36); display.print(c2f1*10,DEC);
+             }
      }
      if (freq==2) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(30,18);    display.print("|PASS   |");  
+      display.setCursor(30,18);    display.print("|PASS   |");
+      display.setCursor(40,36); display.print(c2f2*10,DEC);   
      }
 
      if (freq==3) {
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
       display.setCursor(30,18);    display.print("|BAND   |");
-      display.setCursor(40,27); display.print(band_display_codes[c2]);
+      display.setCursor(40,27); display.print(band_display_codes[c2f3]);
      }
      if (misc==1){
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(77,18); display.print(" ZOOM");  
+      display.setCursor(77,18); display.print(" ZOOM");
+      display.setCursor(84,27); display.print(c3d1,DEC);       
      }
      if (misc==2){
       display.setCursor(0,9); display.print("-MOD-|--FRQ--|-DISP-"); 
-      display.setCursor(77,18); display.print(" WF Min");  
+      display.setCursor(77,18); display.print(" WF Min"); 
+      display.setCursor(84,27); display.print(-c3d2,DEC); 
      }
      
      if (misc==0){
@@ -323,16 +352,20 @@ void setup() {
   display.display();
   
   val1=0;
-  // initial rotary start values
-  initial_mod_mod=3; //LSB    
-  initial_freq=0; //FAST
-  initial_disp_zoom=7; //ZOOM=7
-  SerialUSB.println(modulation_codes[c1]);                        
-  Keyboard.write(modulation_codes[c1]);
-  disp_all();
-  
-//c1=initial_vol;// initial volume
+  val2=0;
+  val3=0;
+//default initial rotary start values
+c1m0=0;// AM
+c1m1=3;// VOL
+c3d1=8;// Zoomvalue (7 if KIWI, 8 if RASP)) 
+c3d2=82;// WF min value
+c2f0=0;  // FAST
+c2f3=0;  // LW
  
+disp_all();
+  
+//c1m2=initial_vol;// initial volume
+//c1m0=0;
 //static int initial_vol=3;
 //static int initial_mod=8;  //LSB
 //static int initial_band=32; //80m
@@ -353,73 +386,64 @@ if (misc!=0){
 prvmodu=modu; 
 modu=read_rsw1();           
 if (prvmodu != modu) {
-  display.setCursor(0,18); display.print(mod_display_codes[c1]);
-  Keyboard.write(modulation_codes[c1]);
+  display.setCursor(0,18); display.print(mod_display_codes[c1m0]);
+  Keyboard.write(modulation_codes[c1m0]);
   SerialUSB.print("modu=");
   SerialUSB.println(modu,DEC);
-  if (modu==2) c1=initial_mod_vol;// initial volume
-  if (modu==0) c1=0;// initial modulation type
+// if (modu==2) c1m2=initial_mod_vol;// initial volume
+//  if (modu==0) c1m0=0;// initial modulation type
   disp_all();
 } 
-
-  //Switch Handling MOD Rotary Button SW1 in sub modus
- 
-               
-             
-
-             
+                            
 //----------------------------------------------------------------------------------Handling MOD Rotary Encoder 1
-//            c1 c1
-// a 97  AM   0  0
-// A 65  SAM  1 -1 
-// d 100 DRM  2 -2
-// l 108 LSB  3 -3
-// u 117 USB  4 -4
-// c 99  CW   5 -5
-// f 102 NFRM 6 -6
-// q 113 IQ   7 -7   
+//            c1m0 c1m0
+// a 97  AM   0    0
+// A 65  SAM  1    -1 
+// d 100 DRM  2    -2
+// l 108 LSB  3    -3
+// u 117 USB  4    -4
+// c 99  CW   5    -5
+// f 102 NFRM 6    -6
+// q 113 IQ   7    -7   
 
 //                                       1of2        1of5     1   1of2     1of2   1of2  1   1
-//                                       a  a  A  A  A  A  A  d   l   l   u   u   n  n  c   i
-// old static int modulation_codes[] = {97,97,65,65,65,65,65,100,108,108,117,117,99,99,102,113};
- 
+//                                       a  a  A  A  A  A  A  d   l   l   u   u   c  c  n   i
+//                                       97,97,65,65,65,65,65,100,108,108,117,117,99,99,102,113};
+//                                       a    A    d     l     u     c    n     i
 //static int modulation_codes[] =      {97,   65,  100,  108,  117,  99,  102,  113}}; keycodes
 //static char *mod_display_codes[] = { "AM","SAM","DRM","LSB","USB","CW","NBFM","IQ"}; 
  
  if((val1=read_rotary_1())) 
- {  
+ { 
+ //int8_t c1=0; 
 //  Handling MOD Rot 1 
-    if (modu==0){                 
-
-          prv_c1=c1; 
-          if ( PrNxt1==0x0b) {//CW  +
-              
-              c1 +=val1;   
-              if (c1==5)  Keyboard.write(modulation_codes[c1]); //KIWI Quirk modulation type key sequence         
+    if (modu==0){
+          prv_c1=c1m0; 
+          if ( PrNxt1==0x0b) {//CW  +              
+              c1m0 +=val1;   
+              if (c1m0==5)  Keyboard.write(modulation_codes[c1m0]); //KIWI Quirk CW modulation type key sequence         
           } 
-          if ( PrNxt1==0x07) {//CCW -          
-               
-              c1 +=val1; 
-                                 
+          if ( PrNxt1==0x07) {//CCW -                         
+              c1m0 +=val1;                                 
           }
-          if (c1>7) c1=7;
-          if (c1<0) c1=0;
-          nxt_c1=c1;
-          SerialUSB.print(" c1= ");
-          SerialUSB.print(c1,DEC);                  
+          if (c1m0>7) c1m0=7;
+          if (c1m0<0) c1m0=0;
+          nxt_c1=c1m0;
+          SerialUSB.print(" c1m0= ");
+          SerialUSB.print(c1m0,DEC);                  
           SerialUSB.print(" mod= ");
-          SerialUSB.println(modulation_codes[c1]);
+          SerialUSB.println(modulation_codes[c1m0]);
             
           if (prv_c1!=nxt_c1){       
-          if (c1==0){Keyboard.write(modulation_codes[c1]);sub_modu=0; }    //AM/AMN 
-          if (c1==1){Keyboard.write(modulation_codes[c1]);sub_modu=1; }    //SAM...QAM
-          if (c1==2){Keyboard.write(modulation_codes[c1]);sub_modu=2; }
-          delay(300);
-          if (c1==3){Keyboard.write(modulation_codes[c1]);sub_modu=3; }    //LSB/LSN
-          if (c1==4){Keyboard.write(modulation_codes[c1]);sub_modu=4; }    //USB/USN
-          if (c1==5){Keyboard.write(modulation_codes[c1]);sub_modu=5; }    //CW/CWN
-          if (c1==6){Keyboard.write(modulation_codes[c1]);sub_modu=6; }
-          if (c1==7){Keyboard.write(modulation_codes[c1]);sub_modu=7; }              
+          if (c1m0==0){Keyboard.write(modulation_codes[c1m0]);sub_modu=0; }    //AM/AMN 
+          if (c1m0==1){Keyboard.write(modulation_codes[c1m0]);sub_modu=1; }    //SAM...QAM
+          if (c1m0==2){Keyboard.write(modulation_codes[c1m0]);sub_modu=2; }
+          delay(250);
+          if (c1m0==3){Keyboard.write(modulation_codes[c1m0]);sub_modu=3; }    //LSB/LSN
+          if (c1m0==4){Keyboard.write(modulation_codes[c1m0]);sub_modu=4; }    //USB/USN
+          if (c1m0==5){Keyboard.write(modulation_codes[c1m0]);sub_modu=5; }    //CW/CWN
+          if (c1m0==6){Keyboard.write(modulation_codes[c1m0]);sub_modu=6; }
+          if (c1m0==7){Keyboard.write(modulation_codes[c1m0]);sub_modu=7; }              
           disp_all();
           //}
           //else {          
@@ -429,44 +453,31 @@ if (prvmodu != modu) {
           //SerialUSB.print(nxt_c1,DEC);  
           SerialUSB.print("sub_modu= ");
           SerialUSB.print(sub_modu,DEC); 
-          }
-
-    
-  }
-  
-
+          }  
+  }//endif modu=0
 
  //Switch Handling FRQ Rotary Button SW2
              prvfreq=freq; 
              freq=read_rsw2();
              if (prvfreq != freq){ 
                 SerialUSB.println(freq,DEC);
-                if (freq==3) c2=initial_freq_band; // initial band
+//                if (freq==3) c2f3=initial_freq_band; // initial band
                 disp_all();
              }
 
-
-
-
-
-
    //Handling VOL Rot1
-    if (modu==2){
-                 
-          if ( PrNxt1==0x0b) {
-                  
+    if (modu==2){                 
+          if ( PrNxt1==0x0b) {                 
                   Keyboard.write(118);//V                                 
-                  SerialUSB.println(c1,DEC);                 
-                }                            
-               
-          
+                  SerialUSB.println(c1m2,DEC);                 
+                }                                                                   
           if ( PrNxt1==0x07) {
                   Keyboard.write(86);//v
-                  SerialUSB.println(c1,DEC);
+                  SerialUSB.println(c1m2,DEC);
                }                                                                                                                              
-    c1 +=val1;  
-    if (c1>=20) c1=20;
-    if (c1<=0) c1=0;   
+    c1m2 +=val1m2;  
+    if ( c1m2>=20)  c1m2=20;
+    if ( c1m2<=0)  c1m2=0;   
     disp_all(); 
     } 
 }//end readrotary_1                       
@@ -477,76 +488,104 @@ if (prvmodu != modu) {
              freq=read_rsw2();
              if (prvfreq != freq){ 
                 SerialUSB.println(freq,DEC);
-                if (freq==3) c2=initial_freq_band; // initial band
+//                if (freq==3) c2f3=initial_freq_band; // initial band
                 disp_all();
              }
 //----------------------------------------------------------------------------------Handling FRQ Rotary Encoder 2
   //Handling FRQ Rotary encoder2 
   //Broadcast / Utility etc.
         
-int8_t valx=0;
-int8_t freq3_valx;                
+//int8_t valx=0;
+//int8_t freq3_valx;                
             if( (val2=read_rotary_2()) ) {                                                                                                  //SerialUSB.print(c2);Serial.print(" ");
                 if ( PrNxt2==0x0b) {
-                  if  (freq==0){Keyboard.press(129); Keyboard.write(215); Keyboard.releaseAll();}   //FAST
-                  if  (freq==1){Keyboard.write(215);}                                               //SLOW
-                  if  (freq==2){Keyboard.write(112);}                                               //PASS p                                                                                                                       //                    59    0   1    2
-                  if  (freq==3){Keyboard.write(66);}                                                //BAND B  CW        20048->LW->MW->120....                                
+                   if  (freq==0){Keyboard.press(129); Keyboard.write(215); Keyboard.releaseAll();}   //FAST
+                   if  (freq==1){Keyboard.write(215);}                                               //SLOW
+                   if  (freq==2){Keyboard.write(112);}                                               //PASS p                                                                                                                       //                    59    0   1    2
+                   if  (freq==3){Keyboard.write(66);}                                                //BAND B  CW        20048->LW->MW->120....                                
                 }                            
                 if ( PrNxt2==0x07) {
                    if (freq==0) {Keyboard.press(129); Keyboard.write(216); Keyboard.releaseAll();}  // FAST
                    if (freq==1) {Keyboard.write(216);}                                              //SLOW
                    if (freq==2){Keyboard.write(80);}                                                //PASS P                                                                            2    1   0   59
                    if (freq==3){Keyboard.write(98);}                                                //BAND b CCW   ..  120<-MW<-LW<-20048
-                       
-                       //SerialUSB.print("c2=");
-                       //SerialUSB.println(c2,DEC);
-                       //SerialUSB.print("band=");
-                       //SerialUSB.println(band_display_codes[c2]);
                  }                
-                 if (freq==3)
-                            
-                       if (valx=read_rsw2()) { 
-                       freq3_valx=0;  // future initial start in frequencyband  
-                       }
-                       //                    
-            
-            c2 +=val2;          
-            //if (c2>60) c2=0;
-            //if (c2<0) c2=60; //for RaspSDR 2 more entries in band_code[] 6m and IPB25
-            if (c2>58) c2=0;
-            if (c2<0) c2=58; //for KiwiSDR 2 less entries in band_code[] no 6m and no IPB25
-            SerialUSB.print("c2=");
-            SerialUSB.println(c2,DEC);
-            SerialUSB.print("band=");
-            SerialUSB.println(band_display_codes[c2]);
+                 if (freq==0){
+                      c2f0 +=val2;
+                      if (c2f0>127) c2f0=127;
+                      if (c2f0<-127) c2f0=-127;
+                      SerialUSB.print("c2f0=");
+                      SerialUSB.println(c2f0,DEC);
+                 } //FAST
+                 if (freq==1){
+                      c2f1 +=val2;
+                      if (c2f1>127) c2f1=127;
+                      if (c2f1<-127) c2f1=-127;
+                      SerialUSB.print("c2f1=");
+                      SerialUSB.println(c2f1,DEC);
+                 } //SLOW
+                 if (freq==2){
+                      c2f2 +=val2;
+                      if (c2f2>127) c2f2=127;
+                      if (c2f2<-127) c2f2=-127;
+                      SerialUSB.print("c2f2=");
+                      SerialUSB.println(c2f2,DEC);              
+                 } //PASS 
+                 if (freq==3){
+                      c2f3 +=val2;
+                      if (c2f3>58) c2f3=0;
+                      if (c2f3<0) c2f3=58; //for KiwiSDR 2 less entries in band_code[] no 6m and no IPB25
+                      //if (c2>60) c2=0;
+                      //if (c2<0) c2=60; //for RaspSDR 2 more entries in band_code[] 6m and IPB25
+                      SerialUSB.print("c2f3=");
+                      SerialUSB.println(c2f3,DEC);
+                      SerialUSB.print("band=");
+                      SerialUSB.println(band_display_codes[c2f0]);
+                 } //BAND                     
             disp_all();
            }  
                                      
  //----------------------------------------------------------------------------------Handling MISC Rotary Encoder 3  
     
              if( (val3=read_rotary_3()) ) {
-                c3 +=val3;
+                
                 //SerialUSB.print(c3);Serial.print(" ");
                 if ( PrNxt3==0x07) {
-                   if  (misc==1){Keyboard.write(122);}// ZOOM z z->CW
+                   if  (misc==1){Keyboard.write(122);}   // ZOOM z z->CW
                    if  (misc==2){Keyboard.write(119);}//WFmin w w=->CW
-                   SerialUSB.print("c3=");
-                   SerialUSB.print(c3,DEC);
-                   SerialUSB.print(" val3=");
-                   SerialUSB.println(val3,HEX);
+                   
                    
                 }
           
                 if ( PrNxt3==0x0b) {
-                   if (misc==1)  Keyboard.write(90);//ZOOM Z Z<-CCW
-                   if  (misc==2){Keyboard.write(87);}// WFmin W<-CCW
-                   SerialUSB.print("c3=");
-                   SerialUSB.print(c3,DEC);
-                   SerialUSB.print(" val3=");
-                   SerialUSB.println(val3,HEX);
+                   if (misc==1) {Keyboard.write(90);}//ZOOM Z Z<-CCW                      
+                   if (misc==2) {Keyboard.write(87);}// WFmin W<-CCW
+                                                                            
+                   
+                  
                 }
+             if  (misc==1){
+                   c3d1 +=val3;                                          
+                   if (c3d1>=14) c3d1=14; 
+                   if (c3d1<1) c3d1=0;                   
+                   SerialUSB.print("c3d1=");
+                   SerialUSB.print(c3d1,DEC);
+                   SerialUSB.print(" val3=");
+                   SerialUSB.println(val3,DEC);}// ZOOM z z->CW 
+              
+              
+              if  (misc==2){
+                   c3d2 +=val3;                                          
+                   if (c3d2<=47) c3d2=47; 
+                   if (c3d2>190) c3d2=190;                   
+                   SerialUSB.print("c3d2=");
+                   SerialUSB.print(-c3d2,DEC);
+                   SerialUSB.print(" val3=");
+                   SerialUSB.println(val3,DEC);}//WFmin W 
+                                      
+              disp_all();
              }
+             
       }// end if misc==0)            
             
           
@@ -559,8 +598,8 @@ int8_t freq3_valx;
                  via_boot=false;
                  SerialUSB.print("misc="); 
                  SerialUSB.println(misc,DEC); 
-                 SerialUSB.println(modulation_codes[c1]);
-                 Keyboard.write(modulation_codes[c1]);
+                 SerialUSB.println(modulation_codes[c3d0]);
+                 Keyboard.write(modulation_codes[c3d0]);
                   /*Waking up from LOCKED Set defaults
                   if (modu==1){SerialUSB.println(misc,DEC);SerialUSB.println(modulation_codes[c1+initial_mod_mod]);                        
                   Keyboard.write(modulation_codes[c1+initial_mod_mod]);
@@ -568,7 +607,7 @@ int8_t freq3_valx;
                   display.setCursor(0,18); display.print(mod_display_codes[c1+initial_mod_mod]); 
                   display.display();
                   if (misc==0){display.setCursor(1,10); display.print("*LOCKED*");} else {display.setCursor(1,10); display.print("*OPEN*");}*/
-                  display.setCursor(0,18); display.print(mod_display_codes[c1]);
+                  display.setCursor(0,18); display.print(mod_display_codes[c1m0]);
                   disp_all();
              }  
 
